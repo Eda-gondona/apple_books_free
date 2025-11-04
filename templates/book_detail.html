@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чтение книги</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .book-cover { text-align: center; margin-bottom: 30px; }
+        .book-cover img { max-width: 300px; max-height: 400px; border-radius: 8px; }
+        .book-info { margin-bottom: 30px; }
+        .book-title { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+        .book-author { font-size: 20px; color: #666; margin-bottom: 15px; }
+        .book-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .meta-item { padding: 8px; background: #f8f9fa; border-radius: 5px; }
+        .read-btn { display: block; width: 200px; margin: 20px auto; padding: 15px; background: #007bff; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-size: 18px; }
+        .read-btn:hover { background: #0056b3; }
+        .book-description { line-height: 1.6; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="book-cover">
+            {% if book.cover_image %}
+                <img src="{{ book.cover_image }}" alt="{{ book.title }}">
+            {% else %}
+                <div style="width: 300px; height: 400px; background: #ddd; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                    <span>Обложка отсутствует</span>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="book-info">
+            <h1 class="book-title">{{ book.title }}</h1>
+            <div class="book-author">Автор: {{ book.author }}</div>
+            
+            <div class="book-meta">
+                <div class="meta-item"><strong>Год:</strong> {{ book.publication_year or 'Не указан' }}</div>
+                <div class="meta-item"><strong>Жанр:</strong> {{ book.genre or 'Не указан' }}</div>
+                <div class="meta-item"><strong>ISBN:</strong> {{ book.isbn or 'Не указан' }}</div>
+                <div class="meta-item"><strong>Издательство:</strong> {{ book.publisher or 'Не указан' }}</div>
+            </div>
+            
+            {% if book.description %}
+                <div class="book-description">
+                    <h3>Описание</h3>
+                    <p>{{ book.description }}</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <a href="/read/{{ book.id }}" class="read-btn">Начать чтение</a>
+    </div>
+</body>
+</html>

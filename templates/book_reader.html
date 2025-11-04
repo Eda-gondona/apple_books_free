@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<!-- Страница для чтения книг -->
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чтение книги</title>
+    <style>
+        /* CSS стили для страницы чтения */
+        
+        /* * - универсальный селектор, применяется ко ВСЕМ элементам */
+        * {
+            box-sizing: border-box;  /* Размер элемента включает padding и border */
+            margin: 0;               /* Убираем внешние отступы */
+            padding: 0;              /* Убираем внутренние отступы */
+        }
+        
+        /* Стили для тела страницы */
+        body {
+            font-family: Arial, sans-serif;  /* Шрифт текста */
+            background: #ffffff;             /* Белый фон */
+            min-height: 100vh;       /* Минимальная высота на весь экран */
+            padding: 20px;           /* Внутренние отступы */
+        }
+        
+        /* Главный контейнер для содержимого */
+        .reader-container {
+            max-width: 1000px;       /* Максимальная ширина */
+            margin: 0 auto;          /* Центрирование */
+            background: white;       /* Белый фон */
+            border-radius: 15px;     /* Закругленные углы */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Легкая тень для объема */
+            overflow: hidden;        /* Скрыть содержимое, выходящее за границы */
+            border: 1px solid #e0e0e0; /* Серая граница */
+        }
+        
+        /* Шапка с информацией о книге */
+        .book-header {
+            background: #000000;     /* Черный фон */
+            color: white;            /* Белый цвет текста */
+            padding: 30px;           /* Внутренние отступы */
+            text-align: center;      /* Выравнивание текста по центру */
+        }
+        
+        /* Название книги */
+        .book-title {
+            font-size: 2.5em;        /* Большой размер шрифта */
+            font-weight: bold;       /* Жирный шрифт */
+            margin-bottom: 10px;     /* Отступ снизу */
+        }
+        
+        /* Автор книги */
+        .book-author {
+            font-size: 1.5em;        /* Размер шрифта */
+            color: #cccccc;          /* Светло-серый цвет */
+            margin-bottom: 20px;     /* Отступ снизу */
+        }
+        
+        /* Контейнер для мета-информации */
+        .book-meta {
+            display: flex;           /* Flexbox для расположения в строку */
+            justify-content: center; /* Выравнивание по центру */
+            gap: 30px;               /* Расстояние между элементами */
+            flex-wrap: wrap;         /* Перенос на новую строку если не помещается */
+        }
+        
+        /* Элемент мета-информации */
+        .meta-item {
+            background: rgba(255,255,255,0.1); /* Полупрозрачный белый фон */
+            padding: 10px 20px;      /* Внутренние отступы */
+            border-radius: 20px;     /* Закругленные углы */
+            font-size: 0.9em;        /* Размер шрифта */
+        }
+        
+        /* Контейнер для содержания книги */
+        .book-content {
+            padding: 40px;           /* Внутренние отступы */
+            line-height: 1.8;        /* Межстрочный интервал */
+            font-size: 18px;         /* Размер шрифта */
+            background: #ffffff;     /* Белый фон */
+            min-height: 500px;       /* Минимальная высота */
+            max-height: 600px;       /* Максимальная высота */
+            overflow-y: auto;        /* Вертикальная прокрутка если не помещается */
+            border-bottom: 1px solid #f0f0f0; /* Серая линия снизу */
+        }
+        
+        /* Заголовок главы */
+        .chapter-title {
+            font-size: 1.8em;        /* Размер шрифта */
+            color: #000000;          /* Черный цвет */
+            margin-bottom: 20px;     /* Отступ снизу */
+            border-bottom: 2px solid #000000; /* Черная линия под заголовком */
+            padding-bottom: 10px;    /* Отступ снизу */
+        }
+        
+        /* Текст книги */
+        .book-text {
+            margin-bottom: 25px;     /* Отступ снизу */
+            text-align: justify;     /* Выравнивание по ширине */
+            color: #333333;          /* Темно-серый цвет текста */
+        }
+        
+        /* Панель управления чтением */
+        .controls {
+            background: #000000;     /* Черный фон */
+            padding: 20px;           /* Внутренние отступы */
+            display: flex;           /* Flexbox для расположения */
+            justify-content: space-between; /* Распределение по ширине */
+            align-items: center;     /* Выравнивание по вертикали */
+            flex-wrap: wrap;         /* Перенос на новую строку */
+            gap: 15px;               /* Расстояние между элементами */
+        }
+        
+        /* Контейнер для кнопок навигации */
+        .nav-buttons {
+            display: flex;           /* Flexbox для расположения в строку */
+            gap: 10px;               /* Расстояние между кнопками */
+        }
+        
+        /* Базовые стили для кнопок */
+        .btn {
+            padding: 12px 25px;      /* Внутренние отступы */
+            border: none;            /* Без границы */
+            border-radius: 8px;      /* Закругленные углы */
+            cursor: pointer;         /* Курсор-указатель при наведении */
+            font-size: 16px;         /* Размер шрифта */
+            transition: all 0.3s ease; /* Плавные переходы */
+        }
+        
+        /* Стили для основной кнопки */
+        .btn-primary {
+            background: #007bff;     /* Синий цвет фона */
+            color: white;            /* Белый цвет текста */
+        }
+        
+        /* Стиль основной кнопки при наведении */
+        .btn-primary:hover {
+            background: #0056b3;     /* Темно-синий цвет фона */
+            transform: translateY(-2px); /* Легкий подъем при наведении */
+        }
+        
+        /* Стили для второстепенной кнопки */
+        .btn-secondary {
+            background: #666666;     /* Темно-серый цвет фона */
+            color: white;            /* Белый цвет текста */
+        }
+        
+        /* Стиль второстепенной кнопки при наведении */
+        .btn-secondary:hover {
+            background: #555555;     /* Более темный серый цвет фона */
+        }
+        
+        /* Полоса прогресса чтения */
+        .progress-bar {
+            flex: 1;                 /* Занимает доступное пространство */
+            max-width: 300px;        /* Максимальная ширина */
+            background: #333333;     /* Темно-серый фон */
+            border-radius: 10px;     /* Закругленные углы */
+            height: 10px;            /* Высота */
+            overflow: hidden;        /* Скрыть содержимое, выходящее за границы */
+        }
+        
+        /* Индикатор прогресса */
+        .progress {
+            height: 100%;            /* Высота 100% родителя */
+            background: #007bff;     /* Синий цвет фона */
+            width: 0%;               /* Начальная ширина */
+            transition: width 0.3s ease; /* Плавное изменение ширины */
+        }
+        
+        /* Информация о текущей странице */
+        .page-info {
+            color: white;            /* Белый цвет текста */
+            font-weight: bold;       /* Жирный шрифт */
+        }
+        
+        /* Стили для выделения текста */
+        .book-text::selection {
+            background: #007bff;     /* Синий фон при выделении */
+            color: white;            /* Белый текст при выделении */
+        }
+        
+        /* Анимация перелистывания страниц */
+        .page-turn {
+            animation: pageTurn 0.5s ease-in-out; /* Применение анимации */
+        }
+        
+        /* Ключевые кадры анимации перелистывания */
+        @keyframes pageTurn {
+            0% { 
+                opacity: 0.7;        /* Полупрозрачный в начале */
+                transform: translateX(-10px); /* Сдвиг влево */
+            }
+            100% { 
+                opacity: 1;          /* Полностью непрозрачный в конце */
+                transform: translateX(0); /* Возврат на место */
+            }
+        }
+        
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            /* Уменьшение размера заголовка на мобильных */
+            .book-title {
+                font-size: 2em;
+            }
+            
+            /* Уменьшение отступов и шрифта на мобильных */
+            .book-content {
+                padding: 20px;
+                font-size: 16px;
+            }
+            
+            /* Вертикальное расположение элементов управления на мобильных */
+            .controls {
+                flex-direction: column;
+            }
+            
+            /* Полная ширина прогресс-бара на мобильных */
+            .progress-bar {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Главный контейнер страницы чтения -->
+    <div class="reader-container">
+        <!-- Шапка с информацией о книге -->
+        <div class="book-header">
+            <!-- Название книги (заполняется JavaScript) -->
+            <h1 class="book-title" id="bookTitle">Название книги</h1>
+            <!-- Автор книги (заполняется JavaScript) -->
+            <div class="book-author" id="bookAuthor">Автор книги</div>
+            <!-- Мета-информация о книге -->
+            <div class="book-meta">
+                <!-- Жанр книги -->
+                <div class="meta-item" id="bookGenre">Жанр: Классика</div>
+                <!-- Год издания -->
+                <div class="meta-item" id="bookYear">Год: 1869</div>
+                <!-- Количество страниц -->
+                <div class="meta-item" id="bookPages">Страниц: 1225</div>
+            </div>
+        </div>
+        
+        <!-- Контейнер для содержания книги -->
+        <div class="book-content" id="bookContent">
+            <!-- Временный индикатор загрузки -->
+            <div class="loading">Загрузка содержания...</div>
+        </div>
+        
+        <!-- Панель управления чтением -->
+        <div class="controls">
+            <!-- Кнопки навигации -->
+            <div class="nav-buttons">
+                <!-- Кнопка "Назад" для перехода к предыдущей странице -->
+                <button class="btn btn-secondary" onclick="previousPage()">← Назад</button>
+                <!-- Кнопка "Вперед" для перехода к следующей странице -->
+                <button class="btn btn-primary" onclick="nextPage()">Вперед →</button>
+            </div>
+            
+            <!-- Полоса прогресса чтения -->
+            <div class="progress-bar">
+                <!-- Индикатор прогресса (заполняется JavaScript) -->
+                <div class="progress" id="readingProgress"></div>
+            </div>
+            
+            <!-- Информация о текущей странице -->
+            <div class="page-info">
+                <!-- Текущая страница (заполняется JavaScript) -->
+                Страница <span id="currentPage">1</span> из <span id="totalPages">1</span>
+            </div>
+            
+            <!-- Кнопка возврата в библиотеку -->
+            <button class="btn btn-secondary" onclick="goToLibrary()">В библиотеку</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript код - добавляет интерактивность странице чтения
+
+        // Данные книг - в реальном приложении это будет загружаться из базы данных
+        const bookContents = {
+            // Книга 1: Война и мир
+            1: {
+                title: "Война и мир",           // Название книги
+                author: "Лев Толстой",          // Автор книги
+                genre: "Роман-эпопея",          // Жанр
+                year: "1869",                   // Год издания
+                pages: "1225",                  // Количество страниц
+                content: [                      // Массив глав/страниц
+                    {
+                        chapter: "Том 1. Часть 1",  // Название главы
+                        text: "— Eh bien, mon prince. Gênes et Lucques ne sont plus que des apanages, des поместья, de la famille Buonaparte. Non, je vous préviens que si vous ne me dites pas que nous avons la guerre, si vous vous permettez encore de pallier toutes les infamies, toutes les atrocités de cet Antichrist (ma parole, j'y crois) — je ne vous connais plus, vous n'êtes plus mon ami, vous n'êtes plus мой верный раб, comme vous dites. Ну, здравствуйте, здравствуйте. Je vois que je vous fais peur, садитесь и рассказывайте."  // Текст главы
+                    },
+                    {
+                        chapter: "Том 1. Часть 1 - Продолжение",
+                        text: "Так говорила в июле 1805 года известная Анна Павловна Шерер, фрейлина и приближенная императрицы Марии Феодоровны, встречая важного и чиновного князя Василия, первого приехавшего на ее вечер. Анна Павловна кашляла несколько дней, у нее был грипп, как она говорила (грипп был тогда новое слово, употреблявшееся только редкими)."
+                    },
+                    {
+                        chapter: "Том 1. Часть 1 - Развитие событий", 
+                        text: "В середине разговора про политические действия Анна Павловна разгорячилась. — Ах, не говорите мне про Австрию! Я ничего не понимаю, может быть, но Австрия никогда не хотела и не хочет войны. Она предает нас. Россия одна должна быть спасительницей Европы. Благодетель знает нашу высокую долю и совершит ее. Верю в одного бога и в высокую судьбу нашего милого императора. Он спасет Европу!"
+                    }
+                ]
+            },
+            // Книга 2: Преступление и наказание
+            2: {
+                title: "Преступление и наказание",
+                author: "Фёдор Достоевский", 
+                genre: "Психологический роман",
+                year: "1866",
+                pages: "672",
+                content: [
+                    {
+                        chapter: "Часть 1",
+                        text: "В начале июля, в чрезвычайно жаркое время, под вечер, один молодой человек вышел из своей каморки, которую нанимал от жильцов в С — м переулке, на улицу и медленно, как бы в нерешимости, отправился к К — ну мосту."
+                    },
+                    {
+                        chapter: "Часть 1 - Продолжение",
+                        text: "Он благополучно избегнул встречи с своею хозяйкой на лестнице. Каморка его приходилась под самою кровлей высокого пятиэтажного дома и походила более на шкаф, чем на квартиру. Квартирная же хозяйка его, у которой он нанимал эту каморку с обедом и прислугой, помещалась одною лестницей ниже, в отдельной квартире, и каждый раз, при выходе на улицу, ему непременно надо было проходить мимо хозяйкиной кухни, почти всегда настежь отворенной на лестницу."
+                    }
+                ]
+            },
+            // Книга 3: Мастер и Маргарита
+            3: {
+                title: "Мастер и Маргарита",
+                author: "Михаил Булгаков",
+                genre: "Фантастический роман", 
+                year: "1967",
+                pages: "480",
+                content: [
+                    {
+                        chapter: "Глава 1. Никогда не разговаривайте с неизвестными",
+                        text: "Однажды весною, в час небывало жаркого заката, в Москве, на Патриарших прудах, появились два гражданина. Первый из них, одетый в летнюю серенькую пару, был маленького роста, упитан, лыс, свою приличную шляпу пирожком нес в руке, а на хорошо выбритом лице его помещались сверхъестественных размеров очки в черной роговой оправе. Второй — плечистый, рыжеватый, вихрастый молодой человек в заломленной на затылок клетчатой кепке — был в ковбойке, жеваных белых брюках и в черных тапочках."
+                    },
+                    {
+                        chapter: "Глава 1 - Продолжение", 
+                        text: "Первый был не кто иной, как Михаил Александрович Берлиоз, председатель правления одной из крупнейших московских литературных ассоциации, сокращенно именуемой МАССОЛИТ, и редактор толстого художественного журнала, а молодой спутник его — поэт Иван Николаевич Понырев, пишущий под псевдонимом Бездомный."
+                    }
+                ]
+            }
+            // Можно добавить остальные книги по аналогии
+        };
+
+        // Текущее состояние чтения
+        let currentBookId = 1;       // ID текущей книги
+        let currentPage = 0;         // Текущая страница (индекс в массиве)
+        let currentChapter = 0;      // Текущая глава
+
+        // Этот код выполняется когда страница полностью загружена
+        document.addEventListener('DOMContentLoaded', function() {
+            // Получаем ID книги из URL (например: /read/1)
+            const urlParts = window.location.pathname.split('/');
+            const bookId = parseInt(urlParts[urlParts.length - 1]);
+            
+            // Проверяем существует ли книга с таким ID
+            if (bookId && bookContents[bookId]) {
+                currentBookId = bookId;
+                loadBook(bookId);    // Загружаем книгу
+            } else {
+                // Если книга не найдена, показываем сообщение об ошибке
+                document.getElementById('bookContent').innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <h2>Книга не найдена</h2>
+                        <p>Извините, запрашиваемая книга временно недоступна.</p>
+                        <button onclick="goToLibrary()" class="btn btn-primary">Вернуться в библиотеку</button>
+                    </div>
+                `;
+            }
+        });
+
+        // Функция для загрузки книги
+        function loadBook(bookId) {
+            const book = bookContents[bookId];  // Получаем данные книги
+            if (!book) return;                  // Если книги нет, выходим
+
+            // Обновляем информацию о книге в шапке
+            document.getElementById('bookTitle').textContent = book.title;
+            document.getElementById('bookAuthor').textContent = book.author;
+            document.getElementById('bookGenre').textContent = `Жанр: ${book.genre}`;
+            document.getElementById('bookYear').textContent = `Год: ${book.year}`;
+            document.getElementById('bookPages').textContent = `Страниц: ${book.pages}`;
+            document.getElementById('totalPages').textContent = book.content.length;
+
+            // Показываем первую страницу книги
+            showPage(0);
+            
+            // Обновляем индикатор прогресса
+            updateProgress();
+        }
+
+        // Функция для показа конкретной страницы
+        function showPage(pageIndex) {
+            const book = bookContents[currentBookId];  // Получаем текущую книгу
+            // Проверяем что страница существует
+            if (!book || pageIndex < 0 || pageIndex >= book.content.length) return;
+
+            currentPage = pageIndex;                   // Обновляем текущую страницу
+            const page = book.content[pageIndex];      // Получаем данные страницы
+            
+            // Анимация перелистывания страниц
+            const contentElement = document.getElementById('bookContent');
+            contentElement.classList.add('page-turn'); // Добавляем класс анимации
+            
+            // Задержка для плавности анимации
+            setTimeout(() => {
+                // Заполняем содержимое страницы
+                contentElement.innerHTML = `
+                    <div class="chapter-title">${page.chapter}</div>
+                    <div class="book-text">${page.text}</div>
+                `;
+                
+                // Обновляем информацию о текущей странице
+                document.getElementById('currentPage').textContent = pageIndex + 1;
+                updateProgress();  // Обновляем прогресс чтения
+                
+                // Убираем класс анимации после завершения
+                setTimeout(() => {
+                    contentElement.classList.remove('page-turn');
+                }, 500);
+                
+            }, 250);
+        }
+
+        // Функция для перехода к следующей странице
+        function nextPage() {
+            const book = bookContents[currentBookId];
+            // Проверяем есть ли следующая страница
+            if (currentPage < book.content.length - 1) {
+                showPage(currentPage + 1);  // Показываем следующую страницу
+            } else {
+                // Если это последняя страница - показываем поздравление
+                alert('Поздравляем! Вы закончили чтение этой книги!');
+            }
+        }
+
+        // Функция для перехода к предыдущей странице  
+        function previousPage() {
+            // Проверяем что текущая страница не первая
+            if (currentPage > 0) {
+                showPage(currentPage - 1);  // Показываем предыдущую страницу
+            }
+        }
+
+        // Функция для обновления индикатор прогресса чтения
+        function updateProgress() {
+            const book = bookContents[currentBookId];
+            // Вычисляем процент прочитанного
+            const progress = ((currentPage + 1) / book.content.length) * 100;
+            // Устанавливаем ширину индикатора прогресса
+            document.getElementById('readingProgress').style.width = progress + '%';
+        }
+
+        // Функция для возврата в библиотеку
+        function goToLibrary() {
+            window.location.href = '/';  // Переход на главную страницу
+        }
+
+        // Обработчик горячих клавиш для удобства чтения
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight') {
+                nextPage();        // Стрелка вправо - следующая страница
+            } else if (event.key === 'ArrowLeft') {
+                previousPage();    // Стрелка влево - предыдущая страница  
+            } else if (event.key === 'Escape') {
+                goToLibrary();     // Escape - вернуться в библиотеку
+            }
+        });
+    </script>
+</body>
+</html>

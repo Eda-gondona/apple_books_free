@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аутентификация</title>
+    <style>
+        /* Стили остаются без изменений */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .auth-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .tabs { display: flex; margin-bottom: 1.5rem; border-bottom: 1px solid #ddd; }
+        .tab { flex: 1; padding: 0.75rem; text-align: center; cursor: pointer; border: none; background: none; font-size: 1rem; }
+        .tab.active { border-bottom: 2px solid #007bff; font-weight: bold; color: #007bff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333; }
+        input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+        input:focus { outline: none; border-color: #007bff; }
+        button { width: 100%; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; margin-top: 0.5rem; }
+        button:hover { background: #0056b3; }
+        .links { text-align: center; margin-top: 1rem; }
+        .links a { color: #007bff; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+        .error { color: #dc3545; text-align: center; margin-bottom: 1rem; padding: 0.5rem; background: #f8d7da; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('login')">Вход</button>
+            <button class="tab" onclick="showTab('register')">Регистрация</button>
+        </div>
+
+        <!-- ВХОД -->
+        <div id="login" class="tab-content active"><!--id уникалный индитификатор этого блока class="tab-content active" - делаем эту вкладку видимой и активной-->
+            <form method="POST" action="/book_list">  <!--POST - отправка action="/auth/postform"-куда отправляем -->
+                <input type="hidden" name="mode" value="login"><!--type="hidden" скрываем поле от пользователя name="mode"-создает ключ в дааных формы value="login" - передает значение "login" для ключа "mode"-->
+                
+                <div class="form-group">
+                    <label for="login-email">Email:</label>
+                    <input type="email" id="login-email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Пароль:</label>
+                    <input type="password" id="login-password" name="passwd" required>  <!-- ✅ passwd вместо password -->
+                </div>
+                
+                <button type="submit">Войти</button>
+            </form>
+            
+            <div class="links">
+                <a href="/auth/forgot">Забыли пароль?</a>  <!-- ✅ Правильный путь -->
+            </div>
+        </div>
+
+        <!-- РЕГИСТРАЦИЯ -->
+        <div id="register" class="tab-content">
+            <form method="POST" action="/book_list">  <!-- ✅ Правильный путь -->
+                <input type="hidden" name="mode" value="signup">
+                
+                <div class="form-group">
+                    <label for="reg-email">Email:</label>
+                    <input type="email" id="reg-email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-fname">Имя:</label>
+                    <input type="text" id="reg-fname" name="fname" required>  <!-- ✅ fname вместо first_name -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-lname">Фамилия:</label>
+                    <input type="text" id="reg-lname" name="lname" required>  <!-- ✅ lname вместо last_name -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-company">Компания (необязательно):</label>
+                    <input type="text" id="reg-company" name="company">  <!-- ✅ Добавить поле company -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-password">Пароль:</label>
+                    <input type="password" id="reg-password" name="passwd" required>  <!-- ✅ passwd для API -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-remember">
+                        <input type="checkbox" id="reg-remember" name="remember" value="true" checked>
+                        Запомнить меня
+                    </label>
+                </div>
+                
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+            
+            <div class="links">
+                <a href="#" onclick="showTab('login')">Уже есть аккаунт?</a>  <!-- ✅ Локальный переход -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убираем активный класс со всех кнопок
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показываем выбранную вкладку
+            document.getElementById(tabName).classList.add('active');
+            
+            // Активируем соответствующую кнопку
+            event.target.classList.add('active');
+        }
+        
+        // Обработка ошибок из URL параметров
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            if (error) {
+                // Можно добавить отображение ошибки на странице
+                console.log('Error from URL:', error);
+            }
+        });
+    </script>
+</body>
+</html>
